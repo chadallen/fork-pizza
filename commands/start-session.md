@@ -20,7 +20,7 @@ If `BD_MISSING`:
 - Print: "Beads (bd) is not installed. Install it first:"
   - macOS: `brew install beads`
   - Other platforms: https://github.com/steveyegge/beads
-- Print: "After installing, re-run `/claude-workflow:start-session`."
+- Print: "After installing, re-run `/fork-pizza:start-session`."
 - Stop here.
 
 ### Check for .beads/
@@ -30,7 +30,7 @@ If `BD_MISSING`:
 ```
 
 If `BEADS_DIR_MISSING`:
-- Print: "No task tracker found in this project. Describe what you want to build and I'll help you create tasks with `/claude-workflow:create-tasks`."
+- Print: "No task tracker found in this project. Describe what you want to build and I'll help you create tasks with `/fork-pizza:create-tasks`."
 - Stop here.
 
 ## Step 1: Check project state
@@ -53,7 +53,7 @@ bd list --tag=session-log --json
 - Create it:
   ```bash
   bd create "Session Log" --type=task --tag=session-log \
-    --description="Running log of session status. Managed by /claude-workflow:start-session and /claude-workflow:end-session. Do not edit manually."
+    --description="Running log of session status. Managed by /fork-pizza:start-session and /fork-pizza:end-session. Do not edit manually."
   ```
 - Note: no history yet — this is the first session.
 - Skip to Step 3.
@@ -87,7 +87,7 @@ Print for the user:
 2. **Active epic status** — If the Session Log references an active epic: count of open/in_progress/closed tasks. Example: "`project-12` (Phase 3): 2 closed, 1 in progress, 4 open."
 3. **Next ready task(s)** — Top 1-3 tasks from `bd ready`, each with ID and title.
 4. **Your tasks** — Any open tasks assigned to the current user. List each with ID and title. These are human-owned — don't claim or work them without being asked.
-5. **Proposed focus** — What you recommend working on this session. Default to the highest-priority ready task. If the remaining tasks in the active epic are well-specified, mention that `/claude-workflow:build-tasks <epic-id>` could run them autonomously.
+5. **Proposed focus** — What you recommend working on this session. Default to the highest-priority ready task. If the remaining tasks in the active epic are well-specified, mention that `/fork-pizza:build-tasks <epic-id>` could run them autonomously.
 6. **Missing ADRs** — If Step 3 found any undocumented architectural decisions from recent sessions, list them here. Offer to create them before starting new work.
 7. **Blockers or questions** — Anything from `bd blocked`, or anything ambiguous where you want clarification before starting.
 8. **Estimated scope** — Rough sense of how much fits in this session.

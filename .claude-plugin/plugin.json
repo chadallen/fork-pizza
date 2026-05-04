@@ -1,13 +1,13 @@
 {
-  "name": "claude-workflow",
+  "name": "fork-pizza",
   "version": "0.1.0",
   "description": "Autonomous sub-agent workflow with Beads task tracking, parallel implementer/reviewer loops, and ADRs.",
   "author": {
     "name": "Chad Allen",
     "url": "https://github.com/chadallen"
   },
-  "homepage": "https://github.com/chadallen/claude-workflow",
-  "repository": "https://github.com/chadallen/claude-workflow",
+  "homepage": "https://github.com/chadallen/fork-pizza",
+  "repository": "https://github.com/chadallen/fork-pizza",
   "license": "MIT",
   "keywords": ["workflow", "agents", "beads", "task-tracking", "adr"],
   "skills": "skills",

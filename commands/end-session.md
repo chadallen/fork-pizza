@@ -16,7 +16,7 @@ ls .beads/proposal.md 2>/dev/null && echo "PROPOSAL_EXISTS" || echo "NO_PROPOSAL
 
 **If `PROPOSAL_EXISTS`** — tasks were planned but never created. Creating them now preserves that work.
 
-Read `.beads/proposal.md` and create the tasks exactly as `/claude-workflow:create-tasks` step 4 would:
+Read `.beads/proposal.md` and create the tasks exactly as `/fork-pizza:create-tasks` step 4 would:
 
 1. If the proposal includes an epic, create it first: `bd create "<title>" -t epic -p 1 --description="..." --json`
 2. Create each task: `bd create "<title>" -t task -p 1 --parent <epic-id> --description="..." --design="..." --acceptance="..." --json`
@@ -78,7 +78,7 @@ Find the session-log issue:
 bd list --tag=session-log --json
 ```
 
-If none exists, create it first (see `/claude-workflow:start-session` Step 2 for the create command).
+If none exists, create it first (see `/fork-pizza:start-session` Step 2 for the create command).
 
 Write a new dated entry and prepend it to the issue's notes, trimming to the 5 most recent entries:
 
@@ -109,7 +109,7 @@ Review what happened this session. Did any decisions meet the ADR criteria?
 - Non-trivial to reverse.
 - The "why" isn't obvious from the code.
 
-If yes, invoke `/claude-workflow:adr` for each one — propose the title and summary, write on approval. If nothing qualifies, move on.
+If yes, invoke `/fork-pizza:adr` for each one — propose the title and summary, write on approval. If nothing qualifies, move on.
 
 ## Step 7: Commit docs
 

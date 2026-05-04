@@ -1,12 +1,12 @@
-# claude-workflow
+# fork-pizza
 
 An autonomous coding workflow for Claude Code. Sub-agents implement tasks in parallel, reviewers check the work, and you stay in the loop at the level you want.
 
 ## What it does
 
 1. **Task tracking** — [Beads](https://github.com/steveyegge/beads) keeps tasks small and well-defined. Epics group related work. Dependencies are tracked.
-2. **Autonomous build loop** — `/claude-workflow:build-tasks` runs implementer agents in parallel (up to 3 per frontier), followed by 8-dimensional code review. You approve the plan and walk away.
-3. **Session orientation** — `/claude-workflow:start-session` reads a Session Log issue and your task state, surfaces what's next, and waits for your go-ahead.
+2. **Autonomous build loop** — `/fork-pizza:build-tasks` runs implementer agents in parallel (up to 3 per frontier), followed by 8-dimensional code review. You approve the plan and walk away.
+3. **Session orientation** — `/fork-pizza:start-session` reads a Session Log issue and your task state, surfaces what's next, and waits for your go-ahead.
 4. **ADRs** — Architecture Decision Records capture why you made the choices you did, so future agents don't re-litigate them.
 
 ## Requirements
@@ -23,53 +23,53 @@ For other platforms, see the [Beads installation docs](https://github.com/stevey
 ## Install
 
 ```bash
-/plugin install github.com/chadallen/claude-workflow
+/plugin install github.com/chadallen/fork-pizza
 ```
 
 Or install a specific version (recommended — see [Risks: /plugin update](#risks)):
 
 ```bash
-/plugin install github.com/chadallen/claude-workflow@v0.1.0
+/plugin install github.com/chadallen/fork-pizza@v0.1.0
 ```
 
 ## Setup
 
 ```
 1. /init                                  # Claude Code built-in — creates CLAUDE.md
-2. /plugin install github.com/chadallen/claude-workflow
-3. /claude-workflow:start-session         # tells you "install bd" if missing
+2. /plugin install github.com/chadallen/fork-pizza
+3. /fork-pizza:start-session         # tells you "install bd" if missing
 4. brew install beads
-5. /claude-workflow:start-session         # tells you "describe work to get started"
-6. /claude-workflow:create-tasks          # describe work; Claude drafts a proposal
-7. /claude-workflow:start-session         # shows ready tasks
-8. /claude-workflow:build-tasks           # agents implement, review, close, push
-9. /claude-workflow:end-session           # writes Session Log, pushes everything
+5. /fork-pizza:start-session         # tells you "describe work to get started"
+6. /fork-pizza:create-tasks          # describe work; Claude drafts a proposal
+7. /fork-pizza:start-session         # shows ready tasks
+8. /fork-pizza:build-tasks           # agents implement, review, close, push
+9. /fork-pizza:end-session           # writes Session Log, pushes everything
 ```
 
-`/claude-workflow:start-session` always tells you what's next — same pattern as `git status`. You don't need to remember the flow.
+`/fork-pizza:start-session` always tells you what's next — same pattern as `git status`. You don't need to remember the flow.
 
 ## Commands
 
 | Command | When |
 |---|---|
-| `/claude-workflow:start-session` | Beginning of every session. Reads Session Log and task state, proposes a plan. |
-| `/claude-workflow:create-tasks` | After brainstorming — turns conversation or a PRD file into tasks. |
-| `/claude-workflow:build-tasks` | Autonomous build loop. Runs implementers, reviewers, and closures. |
-| `/claude-workflow:end-session` | End of every session. Writes Session Log entry, commits, pushes. |
-| `/claude-workflow:adr` | Record an architectural decision. Usually invoked automatically by end-session. |
+| `/fork-pizza:start-session` | Beginning of every session. Reads Session Log and task state, proposes a plan. |
+| `/fork-pizza:create-tasks` | After brainstorming — turns conversation or a PRD file into tasks. |
+| `/fork-pizza:build-tasks` | Autonomous build loop. Runs implementers, reviewers, and closures. |
+| `/fork-pizza:end-session` | End of every session. Writes Session Log entry, commits, pushes. |
+| `/fork-pizza:adr` | Record an architectural decision. Usually invoked automatically by end-session. |
 
 ### Keyboard tip
 
-All commands autocomplete — type `/claude-workflow:` and press Tab to see the picker.
+All commands autocomplete — type `/fork-pizza:` and press Tab to see the picker.
 
 ### build-tasks flags
 
 ```
-/claude-workflow:build-tasks                    # next ready task (asks: run to completion or checkpoints?)
-/claude-workflow:build-tasks --auto             # run until complete, no prompts
-/claude-workflow:build-tasks --checkpoints      # stop for review after each task
-/claude-workflow:build-tasks <epic-id>          # all tasks in an epic
-/claude-workflow:build-tasks <task-id>          # one specific task
+/fork-pizza:build-tasks                    # next ready task (asks: run to completion or checkpoints?)
+/fork-pizza:build-tasks --auto             # run until complete, no prompts
+/fork-pizza:build-tasks --checkpoints      # stop for review after each task
+/fork-pizza:build-tasks <epic-id>          # all tasks in an epic
+/fork-pizza:build-tasks <task-id>          # one specific task
 ```
 
 ## Skills (auto-invoked, not user-facing)
@@ -118,8 +118,8 @@ Breaking changes (renaming a command, changing hook contracts) will bump the min
 There are open Claude Code issues ([#15642](https://github.com/anthropics/claude-code/issues/15642), [#29071](https://github.com/anthropics/claude-code/issues/29071)) where `/plugin update` runs `git fetch` but doesn't fast-forward the local cache. Until these are fixed, upgrade by reinstalling:
 
 ```bash
-/plugin uninstall claude-workflow
-/plugin install github.com/chadallen/claude-workflow@<new-tag>
+/plugin uninstall fork-pizza
+/plugin install github.com/chadallen/fork-pizza@<new-tag>
 ```
 
 ### Hook trust model
@@ -128,7 +128,7 @@ The SessionStart hook runs `scripts/inject-conventions.sh` automatically each se
 
 ## Contributing
 
-Language skills (TS, Python, iOS today) are the most frequent addition request. Before adding a new language: consider whether a companion plugin (`claude-workflow-rust`, etc.) would be a better fit than expanding this one. The core workflow is language-agnostic; the skills are additive.
+Language skills (TS, Python, iOS today) are the most frequent addition request. Before adding a new language: consider whether a companion plugin (`fork-pizza-rust`, etc.) would be a better fit than expanding this one. The core workflow is language-agnostic; the skills are additive.
 
 PRs that change command behavior (start-session, end-session, build-tasks, create-tasks) should include a note on what breaks for existing users.
 

@@ -9,7 +9,7 @@ Turns recent conversation context into tasks (and an epic if the work warrants i
 
 Use this when:
 - You've discussed a feature or set of changes in chat
-- You have a PRD or spec file to ingest: `/claude-workflow:create-tasks PRD.md`
+- You have a PRD or spec file to ingest: `/fork-pizza:create-tasks PRD.md`
 - The work is well-enough defined to break into tasks
 
 ---
@@ -17,8 +17,8 @@ Use this when:
 ## Usage
 
 ```
-/claude-workflow:create-tasks              # use preceding conversation to create tasks
-/claude-workflow:create-tasks PRD.md       # ingest a PRD or spec file
+/fork-pizza:create-tasks              # use preceding conversation to create tasks
+/fork-pizza:create-tasks PRD.md       # ingest a PRD or spec file
 ```
 
 ---
@@ -171,7 +171,7 @@ Print:
 - Task count and IDs
 - Dependency summary (e.g., "task 2 depends on task 1; task 3 depends on tasks 1 and 2")
 - Next step — tell the user explicitly:
-  - To build autonomously: run `/claude-workflow:build-tasks <epic-id> --auto`
+  - To build autonomously: run `/fork-pizza:build-tasks <epic-id> --auto`
   - To work tasks manually: you're already in a session — just start working the first ready task.
 
 Do NOT offer to start building or begin implementation. Your job ends here.

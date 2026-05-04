@@ -6,10 +6,10 @@ To develop the plugin locally without publishing:
 
 ```bash
 # From your project directory:
-/plugin install /path/to/claude-workflow
+/plugin install /path/to/fork-pizza
 
 # Or if Claude Code supports symlinks in the plugin path:
-ln -s /path/to/claude-workflow ~/.claude/plugins/cache/local/claude-workflow
+ln -s /path/to/fork-pizza ~/.claude/plugins/cache/local/fork-pizza
 ```
 
 If local install isn't supported, copy the plugin to the global cache directly and restart Claude Code.
@@ -19,8 +19,8 @@ If local install isn't supported, copy the plugin to the global cache directly a
 Because `/plugin update` has known issues (see README), document upgrades as:
 
 ```bash
-/plugin uninstall claude-workflow
-/plugin install github.com/chadallen/claude-workflow@v<new>
+/plugin uninstall fork-pizza
+/plugin install github.com/chadallen/fork-pizza@v<new>
 ```
 
 ## Version contract
@@ -54,16 +54,16 @@ If you change the convention rules, update `docs/conventions.md`. The hook picks
 
 ## Namespace
 
-All user-facing commands get the `claude-workflow:` prefix automatically. References in docs and agent prompts should use the full prefixed form: `/claude-workflow:start-session`, not `/start-session`.
+All user-facing commands get the `fork-pizza:` prefix automatically. References in docs and agent prompts should use the full prefixed form: `/fork-pizza:start-session`, not `/start-session`.
 
 ## Testing the plugin
 
 Smoke test checklist:
 
 1. Install into a fresh project directory with no `.beads/`.
-2. Run `/claude-workflow:start-session` → expect "install bd" (if bd missing) or "no tasks yet."
-3. Install bd. Run `/claude-workflow:start-session` → expect "no tasks yet — describe work."
-4. Run `/claude-workflow:create-tasks` and describe a small feature → proposal written, tasks created on approval.
-5. Run `/claude-workflow:start-session` → expect ready task summary.
-6. Run `/claude-workflow:build-tasks --auto` → implementer runs, reviewer runs, task closes, push succeeds.
-7. Run `/claude-workflow:end-session` → Session Log entry written, push succeeds.
+2. Run `/fork-pizza:start-session` → expect "install bd" (if bd missing) or "no tasks yet."
+3. Install bd. Run `/fork-pizza:start-session` → expect "no tasks yet — describe work."
+4. Run `/fork-pizza:create-tasks` and describe a small feature → proposal written, tasks created on approval.
+5. Run `/fork-pizza:start-session` → expect ready task summary.
+6. Run `/fork-pizza:build-tasks --auto` → implementer runs, reviewer runs, task closes, push succeeds.
+7. Run `/fork-pizza:end-session` → Session Log entry written, push succeeds.

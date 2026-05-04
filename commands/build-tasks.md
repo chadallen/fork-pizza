@@ -7,20 +7,20 @@ argument-hint: "[epic-id | task-id ...] [--auto | --checkpoints]"
 
 Build tasks autonomously. Each frontier of ready tasks runs in parallel (up to 3 siblings), followed by parallel code reviews, then close and push before advancing to the next frontier.
 
-Use when tasks are well-specified and can be implemented without real-time human judgment. For UI work that needs visual iteration or live design decisions, work tasks manually with `/claude-workflow:start-session` instead.
+Use when tasks are well-specified and can be implemented without real-time human judgment. For UI work that needs visual iteration or live design decisions, work tasks manually with `/fork-pizza:start-session` instead.
 
 ## Usage
 
-Should only be invoked after `/claude-workflow:start-session` to ensure context is fresh and the agent is oriented. If the user invokes it without starting a session, instruct the user to invoke `/claude-workflow:start-session` first.
+Should only be invoked after `/fork-pizza:start-session` to ensure context is fresh and the agent is oriented. If the user invokes it without starting a session, instruct the user to invoke `/fork-pizza:start-session` first.
 
 ```
-/claude-workflow:build-tasks                              # next ready task (asks checkpoint preference)
-/claude-workflow:build-tasks --auto                       # next ready task, run until complete, no prompts
-/claude-workflow:build-tasks --checkpoints               # next ready task, stop for review after each task
-/claude-workflow:build-tasks <epic-id>                    # all tasks in an epic (asks checkpoint preference)
-/claude-workflow:build-tasks <epic-id> --auto             # all tasks in an epic, run until complete
-/claude-workflow:build-tasks <epic-id> --checkpoints      # all tasks in an epic, stop for review after each
-/claude-workflow:build-tasks <task-id> [<task-id>]        # specific tasks
+/fork-pizza:build-tasks                              # next ready task (asks checkpoint preference)
+/fork-pizza:build-tasks --auto                       # next ready task, run until complete, no prompts
+/fork-pizza:build-tasks --checkpoints               # next ready task, stop for review after each task
+/fork-pizza:build-tasks <epic-id>                    # all tasks in an epic (asks checkpoint preference)
+/fork-pizza:build-tasks <epic-id> --auto             # all tasks in an epic, run until complete
+/fork-pizza:build-tasks <epic-id> --checkpoints      # all tasks in an epic, stop for review after each
+/fork-pizza:build-tasks <task-id> [<task-id>]        # specific tasks
 ```
 
 ## Concepts
@@ -44,7 +44,7 @@ bd list --parent <epic-id> --json
 
 Read the epic's description for context. Count tasks by status. Handle cases:
 - Epic doesn't exist → stop, tell the user.
-- All tasks closed → epic complete, stop, suggest `/claude-workflow:end-session`.
+- All tasks closed → epic complete, stop, suggest `/fork-pizza:end-session`.
 - No ready tasks, some open → check `bd blocked --json`, report blockers, stop.
 
 **Task list mode:** arguments are specific task IDs. Verify each exists and is open. Skip any already closed.
@@ -182,7 +182,7 @@ When the loop finishes:
 bd dolt push
 ```
 
-Print: what was built, tasks closed this run, frontiers executed, commits pushed. Suggest `/claude-workflow:end-session`.
+Print: what was built, tasks closed this run, frontiers executed, commits pushed. Suggest `/fork-pizza:end-session`.
 
 ## Step 5: Early termination
 

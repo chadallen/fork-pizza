@@ -33,7 +33,7 @@ Always in `.gitignore`. Never read by agents. Used for ephemeral working notes o
 
 One Beads issue per project tagged `session-log` holds the running session history.
 
-- `/claude-workflow:start-session` auto-creates it on first use.
-- `/claude-workflow:end-session` prepends a dated entry to the `notes` field and trims to the last 5 entries.
+- `/fork-pizza:start-session` auto-creates it on first use.
+- `/fork-pizza:end-session` prepends a dated entry to the `notes` field and trims to the last 5 entries.
 - Never write session history to CLAUDE.md or any other file — the Session Log is the only durable record.
 - The most recent entry (first in notes) is the "last session recap" for `/start-session`.

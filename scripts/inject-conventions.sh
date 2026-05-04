@@ -10,7 +10,7 @@ if ! command -v bd >/dev/null 2>&1; then
   echo "⚠️  Beads (bd) not found on PATH."
   echo "   macOS: brew install beads"
   echo "   Other: https://github.com/steveyegge/beads"
-  echo "   Run /claude-workflow:start-session after installing."
+  echo "   Run /fork-pizza:start-session after installing."
   exit 0
 fi
 
