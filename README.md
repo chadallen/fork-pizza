@@ -135,7 +135,3 @@ PRs that change command behavior (start-session, end-session, build-tasks, creat
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
----
-
-Workflow approach inspired by [Jarred Kenny](https://jx0.ca/solving-agent-context-loss/).
