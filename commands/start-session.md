@@ -1,0 +1,103 @@
+---
+description: Orients the agent at the start of a coding session. Reads the Session Log and task state, flags missing ADRs, surfaces ready tasks, and proposes a plan for user approval. Also trampolines to the right next step if Beads isn't set up yet.
+---
+
+# Start Session
+
+Run this procedure exactly. Do NOT write any code or make any changes until the user explicitly approves the plan.
+
+If `bd setup claude` has been run on this project, task context is already injected at session start by the SessionStart hook (`bd prime`). Build on that context — don't duplicate it.
+
+## Step 0: Trampoline — check prerequisites
+
+### Check for bd
+
+```bash
+command -v bd >/dev/null 2>&1 && echo "BD_FOUND" || echo "BD_MISSING"
+```
+
+If `BD_MISSING`:
+- Print: "Beads (bd) is not installed. Install it first:"
+  - macOS: `brew install beads`
+  - Other platforms: https://github.com/steveyegge/beads
+- Print: "After installing, re-run `/claude-workflow:start-session`."
+- Stop here.
+
+### Check for .beads/
+
+```bash
+[ -d ".beads" ] && echo "BEADS_DIR_EXISTS" || echo "BEADS_DIR_MISSING"
+```
+
+If `BEADS_DIR_MISSING`:
+- Print: "No task tracker found in this project. Describe what you want to build and I'll help you create tasks with `/claude-workflow:create-tasks`."
+- Stop here.
+
+## Step 1: Check project state
+
+Run `git status` and `git log --oneline -5`.
+
+- If the working tree is dirty, stop and tell the user. Don't proceed until they decide what to do with the uncommitted work.
+- Note the current branch.
+- The most recent commit message often summarizes what happened last session.
+
+## Step 2: Read the Session Log
+
+Find the session-log issue:
+
+```bash
+bd list --tag=session-log --json
+```
+
+**If no session-log issue exists** (first run in this project):
+- Create it:
+  ```bash
+  bd create "Session Log" --type=task --tag=session-log \
+    --description="Running log of session status. Managed by /claude-workflow:start-session and /claude-workflow:end-session. Do not edit manually."
+  ```
+- Note: no history yet — this is the first session.
+- Skip to Step 3.
+
+**If it exists:**
+- Run `bd show <session-log-id>` and read the `notes` field.
+- The most recent entry (first in notes) is the last session recap.
+- If the notes reference an active epic ID, note it for Step 4.
+
+## Step 3: Scan for missing ADRs
+
+If `docs/adr/` exists, review the most recent Session Log entry. If it mentions an architectural decision that doesn't have a corresponding ADR, note it. Don't create it now — surface it in the session plan (Step 5) so the user can decide.
+
+## Step 4: Check task state
+
+If `bd prime` already ran via hook, you have most of this. Otherwise run:
+
+- `bd ready --json` — next ready tasks
+- `bd blocked --json` — blocked tasks
+- If the Session Log references an active epic, run `bd list --parent <epic-id> --json` to see all tasks and their status
+
+Also run `bd list --assignee="$(git config user.name)" --status=open --json` to find tasks assigned to the current user. These are human-owned — don't claim or work them without being asked.
+
+**Context check:** Review the ready tasks' `description` and `design` fields. If they provide enough context, stop here. If tasks reference product requirements that aren't clear from the fields alone, read the relevant section of PRD.md. Read PRD.md in full only as a last resort.
+
+## Step 5: Present the session plan
+
+Print for the user:
+
+1. **Last session recap** — 2-3 sentences from the most recent Session Log entry (or "First session — no history yet.").
+2. **Active epic status** — If the Session Log references an active epic: count of open/in_progress/closed tasks. Example: "`project-12` (Phase 3): 2 closed, 1 in progress, 4 open."
+3. **Next ready task(s)** — Top 1-3 tasks from `bd ready`, each with ID and title.
+4. **Your tasks** — Any open tasks assigned to the current user. List each with ID and title. These are human-owned — don't claim or work them without being asked.
+5. **Proposed focus** — What you recommend working on this session. Default to the highest-priority ready task. If the remaining tasks in the active epic are well-specified, mention that `/claude-workflow:build-tasks <epic-id>` could run them autonomously.
+6. **Missing ADRs** — If Step 3 found any undocumented architectural decisions from recent sessions, list them here. Offer to create them before starting new work.
+7. **Blockers or questions** — Anything from `bd blocked`, or anything ambiguous where you want clarification before starting.
+8. **Estimated scope** — Rough sense of how much fits in this session.
+
+## Step 6: Wait
+
+Do NOT proceed until the user approves the plan, modifies it, or gives a different direction. Do not write code until you have explicit approval.
+
+Once approved:
+
+- Claim the task: `bd update <task-id> --claim --json`
+- Begin work.
+- Commit frequently with the issue ID in parens: `git commit -m "Add X (<task-id>)"`. This enables orphan detection at session end.
