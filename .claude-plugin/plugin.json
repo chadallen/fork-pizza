@@ -10,7 +10,15 @@
   "repository": "https://github.com/chadallen/fork-pizza",
   "license": "MIT",
   "keywords": ["workflow", "agents", "beads", "task-tracking", "adr"],
-  "skills": "skills",
-  "agents": "agents",
-  "commands": "commands"
+  "commands": [
+    "./commands/start-session.md",
+    "./commands/end-session.md",
+    "./commands/create-tasks.md",
+    "./commands/build-tasks.md",
+    "./commands/adr.md"
+  ],
+  "agents": [
+    "./agents/implementer.md",
+    "./agents/code-reviewer.md"
+  ]
 }
