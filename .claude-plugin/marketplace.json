@@ -6,11 +6,7 @@
   "plugins": [
     {
       "name": "fork-pizza",
-      "source": {
-        "source": "github",
-        "repo": "chadallen/fork-pizza",
-        "ref": "main"
-      },
+      "source": "./plugins/fork-pizza",
       "description": "Autonomous sub-agent workflow with Beads task tracking, parallel implementer/reviewer loops, and ADRs."
     }
   ]
