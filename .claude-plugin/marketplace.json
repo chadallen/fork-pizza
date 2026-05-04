@@ -1,0 +1,13 @@
+{
+  "name": "fork-pizza",
+  "owner": {
+    "name": "Chad Allen"
+  },
+  "plugins": [
+    {
+      "name": "fork-pizza",
+      "source": ".",
+      "description": "Autonomous sub-agent workflow with Beads task tracking, parallel implementer/reviewer loops, and ADRs."
+    }
+  ]
+}
