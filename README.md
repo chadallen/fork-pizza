@@ -22,22 +22,26 @@ For other platforms, see the [Beads installation docs](https://github.com/stevey
 
 ## Install
 
-```bash
-/plugin install github.com/chadallen/fork-pizza
+```
+/plugin marketplace add chadallen/fork-pizza
+/plugin install fork-pizza@fork-pizza
 ```
 
-Or install a specific version (recommended — see [Risks: /plugin update](#risks)):
+To pin to a specific version (recommended — see [Risks: /plugin update](#risks)):
 
-```bash
-/plugin install github.com/chadallen/fork-pizza@v0.1.0
 ```
+/plugin marketplace add chadallen/fork-pizza
+/plugin install fork-pizza@fork-pizza@v0.1.0
+```
+
+> **SSH users:** If you get a "Permission denied (publickey)" error, run `gh auth login` to set up HTTPS credentials, or add `export GH_TOKEN=<your-pat>` to your shell config.
 
 ## Setup
 
 ```
 1. /init                                  # Claude Code built-in — creates CLAUDE.md
-2. /plugin install github.com/chadallen/fork-pizza
-3. /fork-pizza:start-session         # tells you "install bd" if missing
+2. /plugin marketplace add chadallen/fork-pizza
+3. /plugin install fork-pizza@fork-pizza
 4. brew install beads
 5. /fork-pizza:start-session         # tells you "describe work to get started"
 6. /fork-pizza:create-tasks          # describe work; Claude drafts a proposal
