@@ -127,7 +127,7 @@ echo "no-code-task" > .beads/review-approved-<task-id>
 
 **If `HAS_CODE_CHANGES`** — dispatch code reviewers. If multiple siblings have code changes, dispatch all reviewers in parallel in a single message.
 
-Dispatch a `fork-pizza:code-reviewer` agent for each task with code changes. Pass:
+Dispatch a `fork-pizza:code-reviewer` agent for each task with code changes (use `run_in_background: true`). Pass:
 
 - The task description and acceptance criteria.
 - The diff: `git diff <base-sha>..<task-commit-sha>`
