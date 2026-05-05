@@ -47,13 +47,13 @@ Run `git status` and `git log --oneline -5`.
 Find the session-log issue:
 
 ```bash
-bd list --tag=session-log --json
+bd list --label session-log --json
 ```
 
 **If no session-log issue exists** (first run in this project):
 - Create it:
   ```bash
-  bd create "Session Log" -t task --tag=session-log \
+  bd create "Session Log" -t task --label session-log \
     --description="Running log of session status. Managed by /fork-pizza:start-session and /fork-pizza:end-session. Do not edit manually." \
     --json
   ```
