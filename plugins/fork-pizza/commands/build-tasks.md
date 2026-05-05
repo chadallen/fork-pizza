@@ -99,9 +99,9 @@ bd update <task-id> --claim --json   # repeat for each sibling
 
 **Run agents in background** so the user can still chat while agents work. Use `run_in_background: true` on all implementer and reviewer dispatches. You'll be notified when each completes.
 
-**If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent in background.
+**If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent in background with `model: "sonnet"`.
 
-**If the frontier has 2-3 siblings:** dispatch all implementers in a single message with multiple parallel Agent tool calls (each with `subagent_type: "fork-pizza:implementer"`, `run_in_background: true`). Include in each implementer's prompt:
+**If the frontier has 2-3 siblings:** dispatch all implementers in a single message with multiple parallel Agent tool calls (each with `subagent_type: "fork-pizza:implementer"`, `run_in_background: true`, `model: "sonnet"`). Include in each implementer's prompt:
 
 - The full task `description`, `design`, and `acceptance` criteria.
 - The parent epic ID and title if one exists.
@@ -127,7 +127,7 @@ echo "no-code-task" > .beads/review-approved-<task-id>
 
 **If `HAS_CODE_CHANGES`** — dispatch code reviewers. If multiple siblings have code changes, dispatch all reviewers in parallel in a single message.
 
-Dispatch a `fork-pizza:code-reviewer` agent for each task with code changes (use `run_in_background: true`). Pass:
+Dispatch a `fork-pizza:code-reviewer` agent for each task with code changes (use `run_in_background: true`, `model: "sonnet"`). Pass:
 
 - The task description and acceptance criteria.
 - The diff: `git diff <base-sha>..<task-commit-sha>`
@@ -142,7 +142,7 @@ If `NEEDS_CHANGES` for any sibling: go to 3.5 for that task.
 
 For each task that needs changes: **fix the issues yourself** directly in the orchestrator. You already have the review feedback with specific file:line references — read the files, make the edits, commit. Don't dispatch a subagent for focused fixes; that wastes time on re-orientation.
 
-Only dispatch a fresh implementer (in background) if the fixes are large enough to warrant it (e.g., the reviewer identified a fundamental design problem requiring a rewrite).
+Only dispatch a fresh implementer (in background, `model: "sonnet"`) if the fixes are large enough to warrant it (e.g., the reviewer identified a fundamental design problem requiring a rewrite).
 
 Re-run the reviewer after fixes using `git diff <base-sha>..HEAD`. Repeat until `APPROVED`.
 
@@ -202,4 +202,5 @@ Do NOT leave any task in an ambiguous state.
 - **Reviewers verify code, not reports.** The code-reviewer reads the actual diff.
 - **Fail loudly.** If something breaks, stop and surface to the user.
 - **Push once per frontier.** After all siblings in a frontier close, push once.
+- **Sonnet for workers.** Implementers and code-reviewers run with `model: "sonnet"`. They have tight specs and don't need the orchestrator's model. The orchestrator stays on whatever the user chose.
 - **Always use `--json`.** All bd commands use `--json`.
