@@ -38,13 +38,38 @@ fi
 - If `scratch.md` exists (any casing), ensure it's in `.gitignore`. Do NOT read it.
 - Don't push yet — one push at the end.
 
-## Step 4: Update CLAUDE.md (if needed)
+## Step 4: CLAUDE.md drift check
 
-Only update if this session changed project-level rules, conventions, tooling, or dependencies. If nothing changed, skip entirely.
+Check whether CLAUDE.md references things that no longer exist. This catches documentation rot before it misleads a future session.
 
-Justifies an edit: new build/test command, new hard rule, removed/renamed something it references. Does NOT belong: progress tracking, session history, architecture decisions (→ ADR).
+### 4.1 Scan for stale references
 
-Keep under 80 lines.
+If CLAUDE.md exists, scan it for:
+
+- **File paths** — any path that looks like `src/...`, `docs/...`, `*.ts`, `*.py`, etc. Check each against the filesystem. Flag any that don't exist.
+- **Scripts/commands** — references to `pnpm <script>`, `npm run <script>`, `make <target>`, etc. Check against `package.json` scripts (or Makefile, pyproject.toml). Flag any that are missing.
+- **Line count** — if CLAUDE.md exceeds 80 lines, note it.
+
+Skip paths inside code fences that are clearly examples or templates (e.g., `output/*.pdf` globs, env var examples).
+
+### 4.2 Check for missing additions
+
+Review what changed this session. Flag if any of these happened but CLAUDE.md doesn't reflect them:
+
+- New build/test/lint command added
+- New hard constraint or convention established
+- File or directory referenced by CLAUDE.md was renamed or moved
+
+### 4.3 Report and offer
+
+**If no drift found:** print "CLAUDE.md is current." and move on.
+
+**If drift found:** print the specific items, then ask:
+
+> "CLAUDE.md has N stale reference(s). Want me to update it before we close out?"
+
+- **If yes:** make the edits, keep under 80 lines, commit with the other session-end work.
+- **If no:** note the drift in the Session Log entry (Step 5) so start-session can re-surface it: `**CLAUDE.md drift:** <brief list of stale items>`.
 
 ## Step 5: Write Session Log entry
 

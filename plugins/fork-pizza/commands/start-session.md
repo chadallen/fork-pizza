@@ -132,9 +132,10 @@ Print for the user:
 4. **Your tasks** — Any open tasks assigned to the current user. List each with ID and title. These are human-owned — don't claim or work them without being asked.
 5. **Proposed focus** — What you recommend working on this session. Default to the highest-priority ready task. If the remaining tasks in the active epic are well-specified, mention that `/fork-pizza:build-tasks <epic-id>` could run them autonomously.
 6. **Project health** — If Step 4 found missing test suite, linter, or type checker, list them here with the recommended tool for the detected stack. Offer to help set them up before starting new work: "Would you like me to add [vitest/eslint/etc.] before we start? It takes a few minutes and strengthens future code reviews."
-7. **Missing ADRs** — If Step 3 found any undocumented architectural decisions from recent sessions, list them here. Offer to create them before starting new work.
-8. **Blockers or questions** — Anything from `bd blocked`, or anything ambiguous where you want clarification before starting.
-9. **Estimated scope** — Rough sense of how much fits in this session.
+7. **CLAUDE.md drift** — If the last Session Log entry contains a `**CLAUDE.md drift:**` note (deferred from a previous end-session), surface it here. Offer to fix it before starting new work.
+8. **Missing ADRs** — If Step 3 found any undocumented architectural decisions from recent sessions, list them here. Offer to create them before starting new work.
+9. **Blockers or questions** — Anything from `bd blocked`, or anything ambiguous where you want clarification before starting.
+10. **Estimated scope** — Rough sense of how much fits in this session.
 
 ## Step 7: Wait
 
