@@ -97,8 +97,11 @@ bd update <task-id> --claim --json   # repeat for each sibling
 
 **Do NOT pre-gather codebase context.** Don't read source files, grep for references, or explore the codebase before dispatching the implementer. The implementer has full tool access (Read, Grep, Glob, Bash) and its own orient/gather-context steps — it will find what it needs faster than you can guess what's relevant. Pre-research wastes tokens and context window in the orchestrator.
 
-**If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent (foreground, not background).
-**If the frontier has 2-3 siblings:** dispatch all implementers in a single message with multiple parallel Agent tool calls (each with `subagent_type: "fork-pizza:implementer"`). Include in each implementer's prompt:
+**Run agents in background** so the user can still chat while agents work. Use `run_in_background: true` on all implementer and reviewer dispatches. You'll be notified when each completes.
+
+**If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent in background.
+
+**If the frontier has 2-3 siblings:** dispatch all implementers in a single message with multiple parallel Agent tool calls (each with `subagent_type: "fork-pizza:implementer"`, `run_in_background: true`). Include in each implementer's prompt:
 
 - The full task `description`, `design`, and `acceptance` criteria.
 - The parent epic ID and title if one exists.
