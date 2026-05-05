@@ -140,7 +140,11 @@ If `NEEDS_CHANGES` for any sibling: go to 3.5 for that task.
 
 ### 3.5 Fix loop
 
-For each task that needs changes: dispatch a fresh implementer with the specific issues and file:line references from the review. Re-run the reviewer after fixes using `git diff <base-sha>..HEAD`. Repeat until `APPROVED`.
+For each task that needs changes: **fix the issues yourself** directly in the orchestrator. You already have the review feedback with specific file:line references — read the files, make the edits, commit. Don't dispatch a subagent for focused fixes; that wastes time on re-orientation.
+
+Only dispatch a fresh implementer (in background) if the fixes are large enough to warrant it (e.g., the reviewer identified a fundamental design problem requiring a rewrite).
+
+Re-run the reviewer after fixes using `git diff <base-sha>..HEAD`. Repeat until `APPROVED`.
 
 **Cap the fix loop at 3 attempts per task.** If still failing after 3 rounds, stop, report to the user, leave the task `in_progress`.
 
