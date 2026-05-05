@@ -42,13 +42,20 @@ Detect the primary language from the affected files or CLAUDE.md, then invoke th
 
 ### 2. Gather context
 
-The `design` field is your primary context source. Use it first.
+You are responsible for understanding the codebase before writing code. The orchestrator intentionally does NOT pre-gather context for you — you have full tool access and should explore the code yourself.
 
-If you need broader context beyond the design field (e.g., a judgment call about an architectural pattern):
+**Start with the task spec:**
+- The `design` field is your primary context source. Read it first.
 - If a parent epic ID was provided, run `bd show <epic-id> --json` to read the epic description.
 - If you still need more, read the relevant section of PRD.md — limit reading to what's relevant.
 
-Read existing code in the affected area before writing. Understand patterns before following them.
+**Then explore the code:**
+- Read every file you plan to modify before changing it. Understand the current structure.
+- Grep for symbols, env vars, function names, or patterns mentioned in the task description to find all usage sites — don't assume the task spec lists every affected location.
+- Check imports/exports: if you're changing a function signature, grep for all callers.
+- Look at adjacent files for style and patterns to match.
+
+**Stop when you have enough.** Don't read the entire codebase. Read what the task touches and one layer out (direct callers/callees). If the design field and affected files give you enough context, move on.
 
 ### 3. Implement
 

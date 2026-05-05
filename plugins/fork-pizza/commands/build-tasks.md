@@ -95,8 +95,9 @@ bd update <task-id> --claim --json   # repeat for each sibling
 
 ### 3.3 Dispatch implementer subagents
 
-**If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent (foreground, not background).
+**Do NOT pre-gather codebase context.** Don't read source files, grep for references, or explore the codebase before dispatching the implementer. The implementer has full tool access (Read, Grep, Glob, Bash) and its own orient/gather-context steps — it will find what it needs faster than you can guess what's relevant. Pre-research wastes tokens and context window in the orchestrator.
 
+**If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent (foreground, not background).
 **If the frontier has 2-3 siblings:** dispatch all implementers in a single message with multiple parallel Agent tool calls (each with `subagent_type: "fork-pizza:implementer"`). Include in each implementer's prompt:
 
 - The full task `description`, `design`, and `acceptance` criteria.
