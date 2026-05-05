@@ -2,14 +2,11 @@
 
 ## Local development
 
-To develop the plugin locally without publishing:
+To develop the plugin locally, add the repo as a local marketplace:
 
-```bash
-# From your project directory:
-/plugin install /path/to/fork-pizza
-
-# Or if Claude Code supports symlinks in the plugin path:
-ln -s /path/to/fork-pizza ~/.claude/plugins/cache/local/fork-pizza
+```
+/plugin marketplace add /path/to/fork-pizza
+/plugin install fork-pizza@fork-pizza
 ```
 
 If local install isn't supported, copy the plugin to the global cache directly and restart Claude Code.
@@ -18,9 +15,10 @@ If local install isn't supported, copy the plugin to the global cache directly a
 
 Because `/plugin update` has known issues (see README), document upgrades as:
 
-```bash
+```
 /plugin uninstall fork-pizza
-/plugin install github.com/chadallen/fork-pizza@v<new>
+/plugin marketplace add chadallen/fork-pizza
+/plugin install fork-pizza@fork-pizza
 ```
 
 ## Version contract
