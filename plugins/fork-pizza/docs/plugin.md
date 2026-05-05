@@ -61,9 +61,9 @@ All user-facing commands get the `fork-pizza:` prefix automatically. References 
 Smoke test checklist:
 
 1. Install into a fresh project directory with no `.beads/`.
-2. Run `/fork-pizza:start-session` → expect "install bd" (if bd missing) or "no tasks yet."
-3. Install bd. Run `/fork-pizza:start-session` → expect "no tasks yet — describe work."
-4. Run `/fork-pizza:create-tasks` and describe a small feature → proposal written, tasks created on approval.
+2. Run `/fork-pizza:start-session` → expect "install bd" (if bd missing) or `.beads/` gets initialized.
+3. With bd installed, run `/fork-pizza:start-session` → expect "Create a PRD.md" (if no PRD) or a proposed task list (if PRD exists).
+4. Run `/fork-pizza:create-tasks` and describe a small feature → proposal printed inline, tasks created on approval.
 5. Run `/fork-pizza:start-session` → expect ready task summary.
 6. Run `/fork-pizza:build-tasks --auto` → implementer runs, reviewer runs, task closes, push succeeds.
 7. Run `/fork-pizza:end-session` → Session Log entry written, push succeeds.

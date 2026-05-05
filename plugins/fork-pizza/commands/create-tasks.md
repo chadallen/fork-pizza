@@ -1,11 +1,11 @@
 ---
-description: Turns recent conversation context (or a PRD file) into tasks and an epic. Writes a proposal for the user to review and edit, then creates the tasks on approval.
+description: Turns recent conversation context (or a PRD file) into tasks and an epic. Prints a proposal inline for the user to review, then creates the tasks on approval.
 argument-hint: "[path/to/PRD.md]"
 ---
 
 # Create Tasks
 
-Turns recent conversation context into tasks (and an epic if the work warrants it). The user reviews a proposal in a scratch markdown file, edits as needed, and the agent creates the tasks when they confirm.
+Turns recent conversation context into tasks (and an epic if the work warrants it). The agent prints a structured proposal inline, the user reviews and requests edits, and the agent creates the tasks when they confirm.
 
 Use this when:
 - You've discussed a feature or set of changes in chat
@@ -38,7 +38,7 @@ If `.beads/` does not exist, run `bd init` before proceeding — this initialize
 **If a file path was provided as an argument** (e.g., `PRD.md`):
 - Read the file in full.
 - Use it as the primary source for tasks, epics, and acceptance criteria.
-- Summarize the scope to the user before proceeding: "I see N features/phases in this doc. I'll break them into tasks — let me draft a proposal."
+- Summarize the scope to the user before proceeding: "I see N features/phases in this doc. I'll break them into tasks."
 
 **If no file path was provided:**
 - Use the preceding conversation as context.
@@ -55,15 +55,9 @@ Default to an epic when there are 3 or more tasks.
 
 ---
 
-## Step 3: Draft the proposal
+## Step 3: Print the proposal
 
-Delete the scratch file if it exists:
-
-```bash
-rm -f .beads/proposal.md
-```
-
-Write a fresh scratch file at `.beads/proposal.md`:
+Print the proposal directly in your response using this format:
 
 ```markdown
 # Task Proposal — [Feature or work summary]
@@ -94,26 +88,26 @@ Keep task descriptions concise — 2-5 sentences. Don't write the full implement
 
 ---
 
-## Step 4: Present for review
+## Step 4: Wait for approval
 
-Tell the user:
+After printing the proposal, tell the user:
 
-> Proposal written to `.beads/proposal.md`. Review and edit as needed — reorder tasks, adjust scope, change dependencies, delete what you don't want. Or tell me here what to change ("drop task 2", "bump priority on task 3", "add a task for X"). Reply when ready and I'll create the tasks.
+> Review the proposal above. Edit requests welcome — "drop task 2", "add a caching task", "merge 3 and 4", "reorder". Reply "go" when ready and I'll create the tasks.
 
 Wait for the user. Don't create any tasks yet.
 
-**React to free-text edit requests inline** — if the user says "drop task 2, add a caching layer task," execute those changes (`bd close`, `bd update`, or update the proposal) in the same turn without a second confirmation loop.
+**React to free-text edit requests inline** — if the user says "drop task 2, add a caching layer task," apply those changes and re-print the revised proposal so the user sees exactly what will be created.
 
 ---
 
 ## Step 5: Create the tasks
 
-When the user confirms, read `.beads/proposal.md` again (the user may have edited it) and create:
+When the user confirms, create from the approved proposal:
 
 ### If there's an epic
 
 ```bash
-bd create "<Epic Title>" -t epic -p 1 \
+bd create "<Epic Title>" -t epic \
   --description="<epic description from proposal>" \
   --json
 ```
@@ -123,7 +117,7 @@ Capture the epic ID.
 ### Create each task
 
 ```bash
-bd create "<Task Title>" -t task -p 1 \
+bd create "<Task Title>" -t task -p <priority> \
   --parent <epic-id> \
   --description="<task description>" \
   --design="<design field from proposal, if present>" \
@@ -132,6 +126,8 @@ bd create "<Task Title>" -t task -p 1 \
 ```
 
 Omit `--parent` if there's no epic.
+
+**Priority:** Assign priority (1 = highest) based on your understanding of the project — importance, urgency, and how critical the task is to unblocking others. The user can adjust during the approval step.
 
 For descriptions with backticks or special characters, write to a temp file and use `--description="$(cat /tmp/task-N.md)"`.
 
@@ -151,12 +147,9 @@ Ask the user if they want to add another task. If yes, repeat Steps 3-5. For add
 
 ---
 
-## Step 7: Clean up and commit
-
-Make sure the user is done. Then:
+## Step 7: Commit
 
 ```bash
-rm .beads/proposal.md
 git add .beads/
 git commit -m "feat: create [epic/tasks] for <work summary>"
 bd dolt push
@@ -182,7 +175,7 @@ Do NOT offer to start building or begin implementation. Your job ends here.
 
 - **Conversation is the source.** Don't invent tasks that weren't mentioned.
 - **Derive acceptance criteria from the source.** Prefer observable behavior ("tapping X shows Y") over implementation details ("function Z returns true").
-- **Read the file again before creating.** The user may have edited it.
+- **Re-print after edits.** If the user requests changes, show the revised proposal so they see exactly what will be created.
 - **Default to smaller tasks.** Tasks should be 30-90 minute chunks of work.
 - **Chain sequential tasks.** A flat list where every task has "Depends on: None" means everything becomes ready at once. Set explicit dependencies for naturally sequential work.
 - **Use `--json`.** All bd commands use `--json` for reliable parsing.

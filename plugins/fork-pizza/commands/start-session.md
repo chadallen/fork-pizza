@@ -6,7 +6,7 @@ description: Orients the agent at the start of a coding session. Reads the Sessi
 
 Run this procedure exactly. Do NOT write any code or make any changes until the user explicitly approves the plan.
 
-If `bd setup claude` has been run on this project, task context is already injected at session start by the SessionStart hook (`bd prime`). Build on that context — don't duplicate it.
+If Beads' own SessionStart hook is configured (via `bd setup claude`), task context is already injected by `bd prime`. Build on that context — don't duplicate it.
 
 ## Step 0: Trampoline — check prerequisites
 
@@ -30,8 +30,9 @@ If `BD_MISSING`:
 ```
 
 If `BEADS_DIR_MISSING`:
-- Print: "No task tracker found in this project. Describe what you want to build and I'll help you create tasks with `/fork-pizza:create-tasks`."
-- Stop here.
+- Run `bd init` to initialize the task tracker for this project.
+- If `bd init` fails (e.g., bd is not installed), print: "Beads could not be initialized. Make sure `bd` is installed and re-run `/fork-pizza:start-session`."
+- Stop here only if init fails. Otherwise continue.
 
 ## Step 1: Check project state
 
@@ -52,14 +53,24 @@ bd list --tag=session-log --json
 **If no session-log issue exists** (first run in this project):
 - Create it:
   ```bash
-  bd create "Session Log" --type=task --tag=session-log \
-    --description="Running log of session status. Managed by /fork-pizza:start-session and /fork-pizza:end-session. Do not edit manually."
+  bd create "Session Log" -t task --tag=session-log \
+    --description="Running log of session status. Managed by /fork-pizza:start-session and /fork-pizza:end-session. Do not edit manually." \
+    --json
   ```
-- Note: no history yet — this is the first session.
-- Skip to Step 3.
+- This is the first session. Check for a PRD:
+  ```bash
+  [ -f "PRD.md" ] && echo "PRD_EXISTS" || echo "PRD_MISSING"
+  ```
+- **If `PRD_MISSING`:**
+  - Print: "This is your first session and no PRD.md was found. Create a PRD.md in the project root describing what you want to build, then re-run `/fork-pizza:start-session`."
+  - Stop here.
+- **If `PRD_EXISTS`:**
+  - Read PRD.md and print: "First session detected. I found a PRD — here's a proposed set of tasks based on it:" followed by a bulleted list of suggested tasks (title + one-line description each).
+  - Print: "Run `/fork-pizza:create-tasks` to turn these into tracked tasks, or tell me how you'd like to adjust them."
+  - Stop here.
 
 **If it exists:**
-- Run `bd show <session-log-id>` and read the `notes` field.
+- Run `bd show <session-log-id> --json` and read the `notes` field.
 - The most recent entry (first in notes) is the last session recap.
 - If the notes reference an active epic ID, note it for Step 4.
 
@@ -69,7 +80,7 @@ If `docs/adr/` exists, review the most recent Session Log entry. If it mentions 
 
 ## Step 4: Check task state
 
-If `bd prime` already ran via hook, you have most of this. Otherwise run:
+If Beads' hook already ran `bd prime`, you have most of this. Otherwise run:
 
 - `bd ready --json` — next ready tasks
 - `bd blocked --json` — blocked tasks

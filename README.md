@@ -73,11 +73,16 @@ The `implementer` and `code-reviewer` agents automatically load a language skill
 | `typescript-developer` | Write TypeScript / JavaScript |
 | `python-developer` | Write Python |
 | `ios-developer` | Write Swift / iOS |
-| `/fork-pizza:adr` | Record an architectural decision. Usually invoked automatically by end-session. |
+
+### Agent-only commands
+
+| Command | Function |
+|---|---|
+| `/fork-pizza:adr` | Record an architectural decision. Invoked by `end-session` — not intended for direct use. |
 
 ## Session Log
 
-One Beads issue per project tagged `session-log` holds the running session history. `/start-session` creates it on first run. `/end-session` prepends a dated entry and keeps the last 5. The result shows up in `bd show` — nothing to maintain manually.
+One Beads issue per project tagged `session-log` holds the running session history. `/fork-pizza:start-session` creates it on first run. `/fork-pizza:end-session` prepends a dated entry and keeps the last 5. The result shows up in `bd show` — nothing to maintain manually.
 
 
 ### Hook trust model

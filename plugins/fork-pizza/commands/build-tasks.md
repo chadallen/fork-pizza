@@ -29,7 +29,7 @@ Should only be invoked after `/fork-pizza:start-session` to ensure context is fr
 
 **Siblings** — tasks running in the same frontier. Each implementer agent is told which files its siblings own so they work on non-overlapping areas and commit atomically before siblings attempt to build.
 
-**Parallel cap** — never dispatch more than 3 implementer agents in a single frontier. If a frontier has more than 3 ready tasks, pick the 3 highest-priority ones and run the rest in a subsequent pass.
+**Parallel cap** — never dispatch more than 3 implementer agents in a single frontier. If a frontier has more than 3 ready tasks, pick the 3 highest-priority ones and run the rest in a subsequent pass. In case of ties, pick the task with the earliest create date. 
 
 ## Step 1: Validate scope
 
@@ -95,18 +95,9 @@ bd update <task-id> --claim --json   # repeat for each sibling
 
 ### 3.3 Dispatch implementer subagents
 
-Find the implementer agent file:
-```bash
-# Try plugin root first, fall back to project .claude/agents/
-IMPLEMENTER="${CLAUDE_PLUGIN_ROOT}/agents/implementer.md"
-[ -f "$IMPLEMENTER" ] || IMPLEMENTER=".claude/agents/implementer.MD"
-```
+**If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent (foreground, not background).
 
-Read the implementer agent file, extract the instructions (everything after the frontmatter `---`), and include them verbatim at the top of each prompt when dispatching `general-purpose` agents.
-
-**If the frontier has 1 task:** dispatch a single implementer (foreground, not background).
-
-**If the frontier has 2-3 siblings:** dispatch all implementers in a single message with multiple Agent tool calls, each running in the background (`run_in_background: true`). Include in each implementer's prompt:
+**If the frontier has 2-3 siblings:** dispatch all implementers in a single message with multiple parallel Agent tool calls (each with `subagent_type: "fork-pizza:implementer"`). Include in each implementer's prompt:
 
 - The full task `description`, `design`, and `acceptance` criteria.
 - The parent epic ID and title if one exists.
@@ -132,7 +123,7 @@ echo "no-code-task" > .beads/review-approved-<task-id>
 
 **If `HAS_CODE_CHANGES`** — dispatch code reviewers. If multiple siblings have code changes, dispatch all reviewers in parallel in a single message.
 
-Find the code-reviewer agent file (same fallback logic as implementer). Read it, extract instructions after the frontmatter, include verbatim at the top of each reviewer prompt. Pass:
+Dispatch a `fork-pizza:code-reviewer` agent for each task with code changes. Pass:
 
 - The task description and acceptance criteria.
 - The diff: `git diff <base-sha>..<task-commit-sha>`

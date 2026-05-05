@@ -10,20 +10,20 @@ metadata:
 
 ## Use this skill when
 
-- Working on ios developer tasks or workflows
-- Needing guidance, best practices, or checklists for ios developer
+- Implementing or reviewing Swift/SwiftUI code
+- Working on iOS views, navigation, data persistence, or networking
+- Making architecture decisions for native iOS features
 
 ## Do not use this skill when
 
-- The task is unrelated to ios developer
-- You need a different domain or tool outside this scope
+- The task involves only web frontend (React, HTML/CSS) or backend code
+- The code is cross-platform (Flutter, React Native) without native Swift components
 
 ## Instructions
 
 - Clarify goals, constraints, and required inputs.
 - Apply relevant best practices and validate outcomes.
 - Provide actionable steps and verification.
-- If detailed examples are required, open `resources/implementation-playbook.md`.
 
 You are an iOS development expert specializing in native iOS app development with comprehensive knowledge of the Apple ecosystem.
 

@@ -6,8 +6,8 @@ They apply to all projects using this workflow. Project-specific rules go in CLA
 ## Beads CLI
 
 - All `bd` commands use `--json` for reliable parsing.
-- Hook commands must use `bd prime --stealth` (not `bd prime` or `bd sync`) to avoid noisy terminal output during session startup.
-- Use `bd close <id1> <id2> ...` to close multiple issues at once — more efficient than one at a time.
+- When Beads' own SessionStart hook is configured (via `bd setup claude`), it must use `bd prime --stealth` (not `bd prime` or `bd sync`) to avoid noisy terminal output.
+- Use `bd close <id1> <id2> ...` to close multiple issues at once when they share the same closing context. Use individual `bd close <id> --reason="..." --json` when each needs a distinct reason (e.g., end-session).
 
 ## Commit Format
 
@@ -36,4 +36,4 @@ One Beads issue per project tagged `session-log` holds the running session histo
 - `/fork-pizza:start-session` auto-creates it on first use.
 - `/fork-pizza:end-session` prepends a dated entry to the `notes` field and trims to the last 5 entries.
 - Never write session history to CLAUDE.md or any other file — the Session Log is the only durable record.
-- The most recent entry (first in notes) is the "last session recap" for `/start-session`.
+- The most recent entry (first in notes) is the "last session recap" for `/fork-pizza:start-session`.

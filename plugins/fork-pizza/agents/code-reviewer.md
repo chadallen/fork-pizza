@@ -40,7 +40,7 @@ Apply the domain knowledge from that skill when synthesizing findings — especi
 
 ### Launch agents
 
-Launch all agents in parallel using a single message with multiple Task tool calls.
+Launch all agents in parallel using a single message with multiple Agent tool calls.
 
 ### Agent 1: Spec Compliance
 ```
@@ -78,11 +78,12 @@ Attempt to run a linter for the changed files. Use this detection order:
    - eslint.config.js or .eslintrc.* → run: npx eslint <changed files>
    - swiftlint.yml or .swiftlint.yml → run: swiftlint <changed files>
 3. Check if any linter binary is available: ruff, eslint, swiftlint, pylint, flake8, tsc.
-4. If no linter is found, run getDiagnostics on changed files for IDE-level type errors and unresolved references.
+4. If no linter is found and `getDiagnostics` is available (IDE connected), run it on changed files for type errors and unresolved references. If unavailable, skip this step.
 
 Report one of:
 - Linter found and ran: list any warnings or errors found, note auto-fixable vs manual
-- No linter found: "No linter configured. getDiagnostics found: [results or 'no issues']."
+- No linter found, getDiagnostics available: "No linter configured. getDiagnostics found: [results or 'no issues']."
+- No linter found, no IDE: "No linter configured and no IDE diagnostics available."
 
 Never fail the review solely because no linter is installed.
 ```

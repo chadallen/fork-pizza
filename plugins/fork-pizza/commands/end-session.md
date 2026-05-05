@@ -6,30 +6,6 @@ description: Closes completed tasks, checks for ADR-worthy decisions, writes a S
 
 Run this procedure exactly. Do NOT write any project code during this procedure. The session is NOT done until the final `git push` and `bd dolt push` succeed.
 
-## Step 0: Check for unprocessed proposal
-
-Before doing anything else, check if `.beads/proposal.md` exists:
-
-```bash
-ls .beads/proposal.md 2>/dev/null && echo "PROPOSAL_EXISTS" || echo "NO_PROPOSAL"
-```
-
-**If `PROPOSAL_EXISTS`** — tasks were planned but never created. Creating them now preserves that work.
-
-Read `.beads/proposal.md` and create the tasks exactly as `/fork-pizza:create-tasks` step 4 would:
-
-1. If the proposal includes an epic, create it first: `bd create "<title>" -t epic -p 1 --description="..." --json`
-2. Create each task: `bd create "<title>" -t task -p 1 --parent <epic-id> --description="..." --design="..." --acceptance="..." --json`
-3. Add dependencies: `bd dep add <dependent> <dependency>`
-4. Delete the proposal: `rm .beads/proposal.md`
-5. Tell the user: "Found unprocessed proposal — created X tasks from it before ending session."
-
-Do NOT silently delete `proposal.md` without creating the tasks. If anything is ambiguous, stop and ask rather than guessing.
-
-**If `NO_PROPOSAL`** — continue to Step 1.
-
----
-
 ## Step 1: Close completed tasks
 
 For each task completed this session:
