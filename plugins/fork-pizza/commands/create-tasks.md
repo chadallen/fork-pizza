@@ -55,7 +55,27 @@ Default to an epic when there are 3 or more tasks.
 
 ---
 
-## Step 3: Print the proposal
+## Step 3: Design review
+
+Before writing the proposal, scan the codebase to catch architectural issues that pure conversation context misses. The goal is to ensure implementers won't end up copy-pasting code or building on top of monolithic foundations that should be decomposed first.
+
+**Read the code the tasks will touch.** For each proposed task, identify the files it will create or modify. Read those files (and their immediate neighbors) to understand the current structure.
+
+**Check for these patterns:**
+
+1. **"Second X" duplication.** If a task adds a second implementation of something (second auth module, second API client, second provider adapter), check whether the first implementation was built to be reused or just built to work. If the first is monolithic with inline utilities, insert a "extract shared infrastructure" task before the "add second X" task. The first implementation can be ad-hoc; the second one demands a shared abstraction.
+
+2. **Missing decomposition.** If a task says "move logic from A to B" but A is a monolith with mixed concerns (e.g., login flow + 2FA relay + session management), the task should first decompose A into clean pieces, then move the relevant piece to B. Don't create a task that will produce a copy of A with minor tweaks.
+
+3. **Interface without shared base.** If one task creates an interface and another implements a second concrete module, check whether the first concrete module (already in the codebase) has utilities that should be shared. If so, add a task between them to extract the shared base.
+
+4. **Config-driven vs. code-driven.** If multiple tasks will create structurally similar modules that differ only in small behavioral details (e.g., "two-step login" vs "single-page login"), consider whether the variation should be config-driven rather than separate files. Suggest a strategy/registry pattern if the variations are small and enumerable.
+
+**How to apply findings:** Revise your mental task list before printing the proposal. Add extraction/refactoring tasks where needed, adjust dependencies, and note in the Design field why the task exists. Don't just flag issues — fix the task structure.
+
+---
+
+## Step 4: Print the proposal
 
 Print the proposal directly in your response using this format:
 
@@ -88,7 +108,7 @@ Keep task descriptions concise — 2-5 sentences. Don't write the full implement
 
 ---
 
-## Step 4: Wait for approval
+## Step 5: Wait for approval
 
 After printing the proposal, tell the user:
 
@@ -100,7 +120,7 @@ Wait for the user. Don't create any tasks yet.
 
 ---
 
-## Step 5: Create the tasks
+## Step 6: Create the tasks
 
 When the user confirms, create from the approved proposal:
 
@@ -141,13 +161,13 @@ Argument order: dependent first, then what it depends on.
 
 ---
 
-## Step 6: Add more tasks if needed
+## Step 7: Add more tasks if needed
 
-Ask the user if they want to add another task. If yes, repeat Steps 3-5. For additional tasks that belong to an existing epic, just create them with `--parent <epic-id>`.
+Ask the user if they want to add another task. If yes, repeat Steps 4-6. For additional tasks that belong to an existing epic, just create them with `--parent <epic-id>`.
 
 ---
 
-## Step 7: Commit
+## Step 8: Commit
 
 ```bash
 git add .beads/
@@ -157,7 +177,7 @@ bd dolt push
 
 ---
 
-## Step 8: Summary
+## Step 9: Summary
 
 Print:
 - Epic ID and title (if created)
