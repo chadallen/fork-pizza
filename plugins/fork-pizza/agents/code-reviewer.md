@@ -38,9 +38,23 @@ Before launching subagents, detect the primary language from the diff and invoke
 
 Apply the domain knowledge from that skill when synthesizing findings — especially Code Quality (Agent 5) and Test Quality (Agent 6) results.
 
-### Launch agents
+### 1. Detect project tooling
 
-Launch all agents in parallel using a single message with multiple Agent tool calls.
+Before launching subagents, check what tooling the project has. Read CLAUDE.md and look for:
+
+- **Test command** — a `test` script in package.json, a `pytest` mention, `*_test.go` files, XCTest targets, or a test command documented in CLAUDE.md.
+- **Lint command** — `eslint`, `ruff`, `swiftlint`, or a lint command in CLAUDE.md.
+
+Record what's present. This determines which agents to launch:
+
+| Tooling | Agents to skip | Note in summary |
+|---------|---------------|-----------------|
+| No test runner | Agent 2 (Test Runner), Agent 6 (Test Quality) | Add to **Setup Suggestions**: "No test suite configured. Consider adding [recommended tool for stack]." |
+| No linter | Agent 3 (Linter) | Add to **Setup Suggestions**: "No linter configured. Consider adding [recommended tool for stack]." |
+
+### 2. Launch agents
+
+Launch all **applicable** agents in parallel using a single message with multiple Agent tool calls. Skip agents marked above as inapplicable — don't dispatch them just to get a "nothing found" report.
 
 ### Agent 1: Spec Compliance
 ```

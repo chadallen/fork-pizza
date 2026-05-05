@@ -72,13 +72,45 @@ bd list --tag=session-log --json
 **If it exists:**
 - Run `bd show <session-log-id> --json` and read the `notes` field.
 - The most recent entry (first in notes) is the last session recap.
-- If the notes reference an active epic ID, note it for Step 4.
+- If the notes reference an active epic ID, note it for Step 5.
 
 ## Step 3: Scan for missing ADRs
 
-If `docs/adr/` exists, review the most recent Session Log entry. If it mentions an architectural decision that doesn't have a corresponding ADR, note it. Don't create it now — surface it in the session plan (Step 5) so the user can decide.
+If `docs/adr/` exists, review the most recent Session Log entry. If it mentions an architectural decision that doesn't have a corresponding ADR, note it. Don't create it now — surface it in the session plan (Step 6) so the user can decide.
 
-## Step 4: Check task state
+## Step 4: Project health check
+
+Check whether the project has a test suite and linter configured. These are not blockers, but their absence weakens code review and increases the chance of regressions shipping undetected.
+
+**Detect the stack** from file extensions, `package.json`, `pyproject.toml`, `Makefile`, `*.xcodeproj`, etc.
+
+**Check for a test runner:**
+
+| Stack | Look for | Recommended |
+|-------|----------|-------------|
+| TypeScript/JS | `vitest` or `jest` in devDependencies, or a `test` script in package.json | `vitest` (ESM-native, fast) |
+| Python | `pytest` in `pyproject.toml` or `requirements*.txt`, or a `tests/` dir | `pytest` |
+| Swift/iOS | `*Tests.swift` files in an XCTest target | XCTest (built-in) |
+| Go | `*_test.go` files | `go test` (built-in) |
+
+**Check for a linter:**
+
+| Stack | Look for | Recommended |
+|-------|----------|-------------|
+| TypeScript/JS | `eslint.config.*`, `.eslintrc.*`, or `eslint` in devDependencies | `eslint` with flat config |
+| Python | `ruff.toml`, `[tool.ruff]` in pyproject.toml, or `ruff` in dependencies | `ruff` |
+| Swift/iOS | `.swiftlint.yml` or `swiftlint` in build phases | `swiftlint` |
+
+**Check for type checking** (if applicable):
+
+| Stack | Look for | Recommended |
+|-------|----------|-------------|
+| TypeScript | `tsc --noEmit` in a script, or `tsconfig.json` | `tsc --noEmit` |
+| Python | `mypy` or `pyright` in dependencies | `mypy` with strict mode |
+
+Record what's present and what's missing — surface it in Step 6.
+
+## Step 5: Check task state
 
 If Beads' hook already ran `bd prime`, you have most of this. Otherwise run:
 
@@ -90,7 +122,7 @@ Also run `bd list --assignee="$(git config user.name)" --status=open --json` to 
 
 **Context check:** Review the ready tasks' `description` and `design` fields. If they provide enough context, stop here. If tasks reference product requirements that aren't clear from the fields alone, read the relevant section of PRD.md. Read PRD.md in full only as a last resort.
 
-## Step 5: Present the session plan
+## Step 6: Present the session plan
 
 Print for the user:
 
@@ -99,11 +131,12 @@ Print for the user:
 3. **Next ready task(s)** — Top 1-3 tasks from `bd ready`, each with ID and title.
 4. **Your tasks** — Any open tasks assigned to the current user. List each with ID and title. These are human-owned — don't claim or work them without being asked.
 5. **Proposed focus** — What you recommend working on this session. Default to the highest-priority ready task. If the remaining tasks in the active epic are well-specified, mention that `/fork-pizza:build-tasks <epic-id>` could run them autonomously.
-6. **Missing ADRs** — If Step 3 found any undocumented architectural decisions from recent sessions, list them here. Offer to create them before starting new work.
-7. **Blockers or questions** — Anything from `bd blocked`, or anything ambiguous where you want clarification before starting.
-8. **Estimated scope** — Rough sense of how much fits in this session.
+6. **Project health** — If Step 4 found missing test suite, linter, or type checker, list them here with the recommended tool for the detected stack. Offer to help set them up before starting new work: "Would you like me to add [vitest/eslint/etc.] before we start? It takes a few minutes and strengthens future code reviews."
+7. **Missing ADRs** — If Step 3 found any undocumented architectural decisions from recent sessions, list them here. Offer to create them before starting new work.
+8. **Blockers or questions** — Anything from `bd blocked`, or anything ambiguous where you want clarification before starting.
+9. **Estimated scope** — Rough sense of how much fits in this session.
 
-## Step 6: Wait
+## Step 7: Wait
 
 Do NOT proceed until the user approves the plan, modifies it, or gives a different direction. Do not write code until you have explicit approval.
 
