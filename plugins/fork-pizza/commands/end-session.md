@@ -85,7 +85,7 @@ Write a new dated entry and prepend it to the issue's notes, trimming to the 5 m
 
 ```bash
 SESSION_LOG_ID=<id from query above>
-EXISTING=$(bd show "$SESSION_LOG_ID" --json | jq -r '.notes // ""')
+EXISTING=$(bd show "$SESSION_LOG_ID" --json | jq -r '(if type == "array" then .[0] else . end).notes // ""')
 
 # Build the new entry — fill in actual content below
 NEW_ENTRY="### $(date +%Y-%m-%d)
