@@ -1,5 +1,7 @@
 # Project Instructions for AI Agents
 
+> **Audience:** This file is for AI agents *developing* the fork-pizza plugin. It is NOT loaded when users install the plugin — Claude Code only reads `.claude-plugin/marketplace.json` and `plugins/fork-pizza/` at install time. Plugin users should read [README.md](README.md). Internal/development docs (PRDs, ADRs, design notes) live in [`docs/dev/`](docs/dev/).
+
 This file provides instructions and context for AI coding agents working on this project.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
