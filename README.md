@@ -32,29 +32,28 @@ For other platforms, see the [Beads installation docs](https://github.com/stevey
 
 ## Usage
 
-Always start with `/fork-pizza:start-session` It tells you what's next so you don't need to remember the flow.
+You need to write a PRD.md and put it in the root of your project's working folder. You can use whatever format you want (obviously you should collaborate with Claude on this).
 
-1. /fork-pizza:start-session         # set up a session, load state, agents review docs
-2. /fork-pizza:create-tasks          # describe work; agents create beads tracking tasks
-3. /fork-pizza:build-tasks           # agents implement, review, close, push
-4. /fork-pizza:end-session           # writes Session Log, pushes everything
-5. /clear                            # clear frequently to conserve context
+Always start with `/fork-pizza:start-session`. Part of its job is to coach you on how to use the workflow, so you don't need to memorize this doc. It's going to look for your PRD the first time you run it, and will complain if you haven't made one yet. 
 
-## Commands
+### Commands
 
 | Command | When |
 |---|---|
-| `/fork-pizza:start-session` | Beginning of every session. Reads Session Log and task state, proposes a plan. |
-| `/fork-pizza:create-tasks` | After brainstorming — turns conversation or a PRD file into tasks. |
+| `/fork-pizza:start-session` | Beginning of every session. Reads Session Log and task state, proposes a plan based on the current state of the project. You approve or modify the plan in conversation. Sometimes this plan will involve creating new tasks, sometimes the plan is just to build tasks that you didn't complete in previous sessions. |
+| `/fork-pizza:create-tasks` | If you have new tasks to create, you can invoke this skill at any time.  |
 | `/fork-pizza:build-tasks` | Autonomous build loop. Runs implementers, reviewers, and closures. |
 | `/fork-pizza:end-session` | End of every session. Writes Session Log entry, commits, pushes. |
 
+You can also use these conversationally: `use create-tasks to create some new tasks`.
 
 ### Keyboard tip
 
-All commands autocomplete — type `/fork-pizza:` and press Tab to see the picker.
+All commands autocomplete — type `/fork-pizza:` and press Tab to see the picker, or type `/start-session` or any command name and press Tab to see the picker.
 
 ### build-tasks flags
+
+You can use these explicit flags if you want, or just say something like `build all of the tasks in the plan using --auto mode` and Claude will invoke the skill.
 
 ```
 /fork-pizza:build-tasks                    # next ready task (asks: run to completion or checkpoints?)
