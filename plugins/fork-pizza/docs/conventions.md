@@ -21,7 +21,7 @@ Never hardcode a model in agent or skill frontmatter — always use `model: inhe
 
 ## CLAUDE.md
 
-- Target length: under 80 lines.
+- Target length: under 120 lines.
 - Session history, progress tracking, and architecture decisions do NOT belong here.
 - Keep to: project description, stack, build/test commands, hard constraints, and project-specific conventions.
 

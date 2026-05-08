@@ -48,7 +48,7 @@ If CLAUDE.md exists, scan it for:
 
 - **File paths** — any path that looks like `src/...`, `docs/...`, `*.ts`, `*.py`, etc. Check each against the filesystem. Flag any that don't exist.
 - **Scripts/commands** — references to `pnpm <script>`, `npm run <script>`, `make <target>`, etc. Check against `package.json` scripts (or Makefile, pyproject.toml). Flag any that are missing.
-- **Line count** — if CLAUDE.md exceeds 80 lines, note it.
+- **Line count** — if CLAUDE.md exceeds 120 lines, note it.
 
 Skip paths inside code fences that are clearly examples or templates (e.g., `output/*.pdf` globs, env var examples).
 
@@ -68,7 +68,7 @@ Review what changed this session. Flag if any of these happened but CLAUDE.md do
 
 > "CLAUDE.md has N stale reference(s). Want me to update it before we close out?"
 
-- **If yes:** make the edits, keep under 80 lines, commit with the other session-end work.
+- **If yes:** make the edits, keep under 120 lines, commit with the other session-end work.
 - **If no:** note the drift in the Session Log entry (Step 5) so start-session can re-surface it: `**CLAUDE.md drift:** <brief list of stale items>`.
 
 ## Step 5: Write Session Log entry
