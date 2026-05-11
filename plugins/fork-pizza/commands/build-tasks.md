@@ -183,6 +183,8 @@ bd dolt push
 
 Print: what was built, tasks closed this run, frontiers executed, commits pushed. Suggest `/fork-pizza:end-session`.
 
+**Auto mode ends here.** The `--auto` flag is scoped to this skill only. Subsequent skills (including `/fork-pizza:end-session`) require normal user interaction — do not carry forward the auto/checkpoint mindset.
+
 ## Step 5: Early termination
 
 If the loop stops before completion:
@@ -192,6 +194,8 @@ If the loop stops before completion:
 - Print what was completed, what stopped the loop, what the user should do next.
 
 Do NOT leave any task in an ambiguous state.
+
+**Auto mode ends here.** The `--auto` flag is scoped to this skill only. Subsequent skills require normal user interaction.
 
 ## Key principles
 

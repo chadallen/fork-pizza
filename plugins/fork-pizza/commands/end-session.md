@@ -6,6 +6,8 @@ description: Closes completed tasks, checks for ADR-worthy decisions, writes a S
 
 Run this procedure exactly. Do NOT write any project code during this procedure. The session is NOT done until the final `git push` and `bd dolt push` succeed.
 
+**Mode reset:** The `--auto` and `--checkpoints` flags are scoped to `/fork-pizza:build-tasks` only. They do NOT carry over to this procedure. Even if the previous skill ran in auto mode, every step here that asks for user input MUST wait for the user's response. Do not skip confirmations or make changes without approval.
+
 ## Step 1: Close completed tasks
 
 For each task completed this session:
