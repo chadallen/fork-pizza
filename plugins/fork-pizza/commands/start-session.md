@@ -42,22 +42,21 @@ Run `git status` and `git log --oneline -5`.
 - Note the current branch.
 - The most recent commit message often summarizes what happened last session.
 
-## Step 2: Read the Session Log
+## Step 2: Read the Session Log and create this session's issue
 
-Find the session-log issue:
+Each session gets its own Beads issue tagged `session-log`. Find the most recent closed one to read the last session recap, then create a new issue for this session.
+
+### 2a: Find the last session recap
 
 ```bash
-bd list --label session-log --json
+bd list --label session-log --status=closed --json
 ```
 
-**If no session-log issue exists** (first run in this project):
-- Create it:
-  ```bash
-  bd create "Session Log" -t task --label session-log \
-    --description="Running log of session status. Managed by /fork-pizza:start-session and /fork-pizza:end-session. Do not edit manually." \
-    --json
-  ```
-- This is the first session. Check for a PRD:
+Parse the JSON result. Sort by `closed_at` descending and take the first entry. If the CLI doesn't sort, sort in the script.
+
+**If no closed session-log issues exist** (first run in this project):
+- Also check for an open session-log issue (`bd list --label session-log --status=open --json`). If one exists, this is a resumed first session — skip the PRD check and proceed to Step 3 (the session issue already exists).
+- Otherwise, this is the first session. Create the session issue now (Step 2b below), then check for a PRD:
   ```bash
   [ -f "PRD.md" ] && echo "PRD_EXISTS" || echo "PRD_MISSING"
   ```
@@ -69,10 +68,20 @@ bd list --label session-log --json
   - Print: "Run `/fork-pizza:create-tasks` to turn these into tracked tasks, or tell me how you'd like to adjust them."
   - Stop here.
 
-**If it exists:**
-- Run `bd show <session-log-id> --json` and read the `notes` field.
-- The most recent entry (first in notes) is the last session recap.
+**If closed session-log issues exist:**
+- Run `bd show <most-recent-id> --json` and read the `notes` field.
+- This is the last session recap.
 - If the notes reference an active epic ID, note it for Step 5.
+
+### 2b: Create this session's issue
+
+```bash
+bd create "Session — $(date +%Y-%m-%d)" -t task --label session-log \
+  --description="Session log entry. Managed by /fork-pizza:start-session and /fork-pizza:end-session." \
+  --json
+```
+
+Save the returned issue ID — `/fork-pizza:end-session` will write to it and close it.
 
 ## Step 3: Scan for missing ADRs
 

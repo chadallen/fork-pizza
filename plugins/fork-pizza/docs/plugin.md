@@ -46,9 +46,9 @@ The SessionStart hook runs `scripts/inject-conventions.sh`. The script:
 
 If you change the convention rules, update `docs/conventions.md`. The hook picks them up automatically on next session.
 
-## The session-log tag
+## The session-log label
 
-`session-log` is a reserved Beads tag. The workflow assumes exactly one issue per project has this tag. Don't use it for other purposes. The tag was chosen over a title prefix because it's queryable (`bd list --tag=session-log --json`) and survives renames.
+`session-log` is a reserved Beads label. The workflow creates one issue per session with this label — created at session start, closed at session end. Don't use it for other purposes. The label was chosen over a title prefix because it's queryable (`bd list --label session-log --json`) and survives renames.
 
 ## Namespace
 

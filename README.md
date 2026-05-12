@@ -81,7 +81,7 @@ The `implementer` and `code-reviewer` agents automatically load a language skill
 
 ## Session Log
 
-One Beads issue per project tagged `session-log` holds the running session history. `/fork-pizza:start-session` creates it on first run. `/fork-pizza:end-session` prepends a dated entry and keeps the last 5. The result shows up in `bd show` — nothing to maintain manually.
+Each session gets its own Beads issue tagged `session-log`. `/fork-pizza:start-session` reads the most recent closed session-log issue for context, then creates a new one. `/fork-pizza:end-session` writes the summary and closes it. Full history is preserved in Dolt — nothing to maintain manually.
 
 
 ### Hook trust model

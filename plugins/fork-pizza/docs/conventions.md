@@ -31,9 +31,9 @@ Always in `.gitignore`. Never read by agents. Used for ephemeral working notes o
 
 ## Session Log
 
-One Beads issue per project tagged `session-log` holds the running session history.
+One Beads issue per session tagged `session-log`. Each session creates its own issue, writes a summary to its notes, and closes it at session end.
 
-- `/fork-pizza:start-session` auto-creates it on first use.
-- `/fork-pizza:end-session` prepends a dated entry to the `notes` field and trims to the last 5 entries.
-- Never write session history to CLAUDE.md or any other file — the Session Log is the only durable record.
-- The most recent entry (first in notes) is the "last session recap" for `/fork-pizza:start-session`.
+- `/fork-pizza:start-session` finds the most recent closed `session-log` issue for the last session recap, then creates a new one for the current session.
+- `/fork-pizza:end-session` writes the session summary into the open `session-log` issue's notes and closes it.
+- Never write session history to CLAUDE.md or any other file — the Session Log issues are the only durable record.
+- History is preserved in Dolt — no trimming needed.

@@ -73,32 +73,38 @@ Review what changed this session. Flag if any of these happened but CLAUDE.md do
 - **If yes:** make the edits, keep under 120 lines, commit with the other session-end work.
 - **If no:** note the drift in the Session Log entry (Step 5) so start-session can re-surface it: `**CLAUDE.md drift:** <brief list of stale items>`.
 
-## Step 5: Write Session Log entry
+## Step 5: Write Session Log entry and close the session issue
 
-Find the session-log issue:
+Find this session's open session-log issue:
 
 ```bash
-bd list --tag=session-log --json
+bd list --label session-log --status=open --json
 ```
 
-If none exists, create it first (see `/fork-pizza:start-session` Step 2 for the create command).
+There should be exactly one (created by `/fork-pizza:start-session`). If none exists, create one now:
 
-Write a new dated entry and prepend it to the issue's notes, trimming to the 5 most recent entries:
+```bash
+bd create "Session — $(date +%Y-%m-%d)" -t task --label session-log \
+  --description="Session log entry. Managed by /fork-pizza:start-session and /fork-pizza:end-session." \
+  --json
+```
+
+Write the session summary directly into the issue's notes field — no prepending, no concatenation:
 
 ```bash
 SESSION_LOG_ID=<id from query above>
-EXISTING=$(bd show "$SESSION_LOG_ID" --json | jq -r '(if type == "array" then .[0] else . end).notes // ""')
 
-# Build the new entry — fill in actual content below
-NEW_ENTRY="### $(date +%Y-%m-%d)
+NOTES="### $(date +%Y-%m-%d)
 <features shipped, tasks closed (with IDs), key decisions made>
 **Next session:** <1-2 recommended task IDs and titles>"
 
-# Prepend new entry and keep only last 5 (entries start with ###)
-COMBINED=$(printf '%s\n\n%s' "$NEW_ENTRY" "$EXISTING")
-TRIMMED=$(echo "$COMBINED" | awk '/^### /{count++} count<=5{print}')
+bd update "$SESSION_LOG_ID" --notes="$NOTES" --json
+```
 
-bd update "$SESSION_LOG_ID" --notes="$TRIMMED" --json
+Then close the issue:
+
+```bash
+bd close "$SESSION_LOG_ID" --reason="Session complete" --json
 ```
 
 Keep entries specific. End each with a "**Next session:**" line naming 1-2 recommended tasks by ID.
