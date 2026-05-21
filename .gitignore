@@ -1,14 +1,1 @@
 .DS_Store
-scratch.md
-
-# Internal development tools — not part of the public plugin
-.beads/
-.claude/
-CLAUDE.md
-AGENTS.md
-docs/
-
-# Beads / Dolt files (added by bd init)
-.dolt/
-*.db
-.beads-credential-key
