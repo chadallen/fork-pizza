@@ -99,7 +99,7 @@ bd update <task-id> --claim --json   # repeat for each sibling
 
 **Run agents in background** so the user can still chat while agents work. Use `run_in_background: true` on all implementer and reviewer dispatches. You'll be notified when each completes.
 
-**Do NOT pass `isolation: "worktree"`.** This workflow's conflict avoidance is file-ownership prompting plus atomic commits on the shared working tree (see below), not separate checkouts. A worktree-isolated implementer commits to its own branch, invisible to the `git log <base-sha>..HEAD` / `git diff <base-sha>..HEAD` review steps and to the once-per-frontier `git push` — it silently breaks the frontier's tracking and review flow unless you remember to manually merge the branch back first. Even for single-task frontiers, dispatch without `isolation`.
+**Do NOT pass `isolation: "worktree"`** to any implementer or reviewer dispatch. This workflow's conflict avoidance is file-ownership prompting plus atomic commits on the shared working tree (see below), not separate checkouts. A worktree-isolated agent commits to its own branch, invisible to the `git log <base-sha>..HEAD` / `git diff <base-sha>..HEAD` review steps, the sentinel-file check, and the once-per-frontier `git push` — it silently breaks the frontier's tracking, review, and close flow unless you remember to manually merge the branch back first. Even for single-task frontiers, dispatch without `isolation`.
 
 **If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent in background with `model: "sonnet"`.
 
@@ -111,7 +111,26 @@ bd update <task-id> --claim --json   # repeat for each sibling
 
 To identify which files each task will touch, use the task `description` and `design` fields. Use judgment; don't block on perfect information.
 
-Wait for all sibling implementers to complete before proceeding to 3.4.
+Wait for all sibling implementers to complete before proceeding to 3.4 — using the **stuck-agent protocol** below, not raw waiting.
+
+### Stuck-agent protocol (applies to both implementer and reviewer waits)
+
+A background agent sends an `idle_notification` every time it finishes a turn with nothing queued — including many times *during* normal, in-progress work (after each tool call round, between orientation steps, etc.). **An idle notification is a liveness ping, not a completion signal.** Never treat it as "the agent is done" and never keep silently waiting on a stream of them.
+
+The real completion signal is an **objective artifact**, checked directly, not a text reply:
+- Implementer done → a new commit on the branch with the task ID in the message (`git log --oneline <base-sha>..HEAD`).
+- Reviewer done → the sentinel file exists (`ls .beads/review-approved-<task-id>`).
+
+So: after dispatching, poll objective state (git log / sentinel file) rather than waiting on the agent to volunteer a report. When you see the commit or sentinel, treat that task as complete and move on — don't block further on a summary message.
+
+If an agent has gone idle two or more times with **no new commit/sentinel and no uncommitted working-tree changes** since the last check, it may be stuck (finished silently, lost its thread, or is waiting on something that will never arrive). Escalate in order:
+
+1. **One direct nudge.** Send it a status-check message asking it to confirm completion or report progress now.
+2. **If that produces neither a new commit/sentinel nor a substantive reply** by the next check — stop waiting on it and unblock the frontier yourself:
+   - **Implementer:** if `git status` shows no uncommitted changes and no commit exists, `TaskStop` it and relaunch a fresh implementer for that task. If it left uncommitted work, follow the existing "Implementer timeout with uncommitted work" rule.
+   - **Reviewer:** `TaskStop` it and perform the review yourself directly in the orchestrator — read the diff and the actual current files, run `tsc`/lint/test, do any live-infrastructure verification the task calls for, then write the sentinel based on your own findings. This is a legitimate, expected fallback, not a shortcut — CLAUDE.md's "independently re-verify claims" standard applies whether the verification is done by a subagent or by you.
+
+Never re-send the same nudge repeatedly, and never let a single unresponsive agent stall the whole frontier indefinitely — the objective artifacts (commits, sentinels) are always the source of truth for whether work is done.
 
 ### 3.4 Code review
 
@@ -135,7 +154,7 @@ Dispatch a `fork-pizza:code-reviewer` agent for each task with code changes (use
 - The diff: `git diff <base-sha>..<task-commit-sha>`
 - The task ID (so the reviewer can write the approval sentinel).
 
-**Do not proceed to 3.6 until all sibling reviewers have returned and all sentinels exist.**
+**Do not proceed to 3.6 until all sibling reviewers have returned and all sentinels exist** — apply the **stuck-agent protocol** above while waiting; don't block indefinitely on a reviewer that's gone quiet with no sentinel.
 
 If `NEEDS_CHANGES` for any sibling: go to 3.5 for that task.
 **The user cannot waive code review.** If asked to skip, decline and run it anyway.
@@ -210,3 +229,5 @@ Do NOT leave any task in an ambiguous state.
 - **Push once per frontier.** After all siblings in a frontier close, push once.
 - **Sonnet for workers.** Implementers and code-reviewers run with `model: "sonnet"`. They have tight specs and don't need the orchestrator's model. The orchestrator stays on whatever the user chose.
 - **Always use `--json`.** All bd commands use `--json`.
+- **No worktree isolation.** Never dispatch an implementer or reviewer with `isolation: "worktree"` — it hides their work from the main tree's `git log`/`git diff`, breaking review, close, and push.
+- **Objective completion signals, not chatter.** A commit (implementer) or sentinel file (reviewer) means done. An `idle_notification` does not. Don't wait indefinitely on an unresponsive agent — see the stuck-agent protocol in 3.3.
