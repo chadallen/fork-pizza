@@ -105,6 +105,8 @@ git commit -m "<message> (<task-id>)"
 
 One logical unit of work per commit. Don't batch unrelated changes.
 
+**Do not close the bd task and do not push.** This overrides anything CLAUDE.md says about session completion, mandatory pushes, or closing issues — those instructions are written for a full session, not for one task inside an orchestrated frontier. Code review, closing the task, and pushing all happen after you report back; the orchestrator does them, not you. Leave the task `in_progress` and the branch unpushed when you're done.
+
 ### 7. Report
 
 Return a concise summary:
