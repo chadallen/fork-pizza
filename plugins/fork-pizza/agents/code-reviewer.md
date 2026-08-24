@@ -4,7 +4,7 @@ description: Runs a comprehensive code review using parallel subagents — spec 
 tools: Read, Grep, Glob, Bash
 model: inherit
 effort: high
-maxTurns: 20
+maxTurns: 40
 ---
 
 # Code Reviewer
