@@ -124,39 +124,29 @@ The real completion signal is an **objective artifact**, checked directly, not a
 - Implementer done → a new commit on the branch with the task ID in the message (`git log --oneline <base-sha>..HEAD`).
 - Reviewer done → the sentinel file exists (`ls .beads/review-approved-<task-id>`).
 
-**Don't wait passively for either signal — poll actively.** Immediately after dispatching each frontier, start a `Monitor` that checks for real progress (file changes or a commit) on a short interval, independent of anything the agent itself reports:
+**Don't wait passively — poll actively, with ONE pattern for both roles.** File mtimes seemed like a natural liveness signal for implementers (editing writes files) but not for reviewers (reading/testing touches nothing), which tempts you into two different mechanisms. Don't — a direct status nudge works identically for both, so use it as the single pattern: an agent that's actually working (reading OR writing) will process a queued message at its next tool-call round and reply with real progress; an agent wedged inside a single blocking tool call (e.g. an MCP tool prompting for interactive auth it can never complete headlessly) won't reply at all, because nothing queued to it runs until that call returns.
+
+Immediately after dispatching each frontier, start a `Monitor` that watches only for the objective completion artifact — a commit for an implementer, the sentinel file for a reviewer — and pings you periodically if it hasn't appeared yet:
 
 ```bash
 cd <repo-root>
-BASE=<base-sha>
-MARKER=/tmp/<task-id>-marker
-touch "$MARKER"
-stall=0
+BASE=<base-sha>   # implementer case; for a reviewer, drop this and check the sentinel instead
 while true; do
   commit=$(git log --oneline "$BASE"..HEAD 2>/dev/null | tail -1)
   if [ -n "$commit" ]; then echo "COMMIT FOUND: $commit"; exit 0; fi
-  changed=$(find . -type f -newer "$MARKER" -not -path './node_modules/*' -not -path './.git/*' -not -path './.next/*' 2>/dev/null)
-  if [ -n "$changed" ]; then
-    echo "progress: $(echo "$changed" | wc -l | tr -d ' ') file(s) touched"; touch "$MARKER"; stall=0
-  else
-    stall=$((stall+1)); elapsed=$((stall*20))
-    [ "$stall" -eq 6 ] && echo "STALL WARNING: no file changes in ~${elapsed}s"
-    [ "$stall" -eq 15 ] && echo "STALL WARNING: no file changes in ~${elapsed}s (getting serious)"
-  fi
-  sleep 20
+  # reviewer case: if [ -f .beads/review-approved-<task-id> ]; then echo "SENTINEL FOUND"; exit 0; fi
+  sleep 90
+  echo "CHECK-IN: no commit/sentinel yet for <task-id> — send a status nudge"
 done
 ```
 
-(For a reviewer, swap the commit check for `ls .beads/review-approved-<task-id>`.) This surfaces a stall in ~2 minutes regardless of whether the agent is idle, busy, or wedged inside a hung tool call — you don't need to be watching its pane or wait for the user to notice and report it.
+On each "CHECK-IN", send the agent a direct message asking what it's currently doing right now — not "are you done," which a stuck agent answering nothing can't distinguish from "still working." A real reply describing genuine progress (files touched, what it's verifying) means keep waiting for the next check-in. Silence through the message — no reply by the next check-in — is the actual stall signal, regardless of whether the agent is an implementer or reviewer.
 
-On a **STALL WARNING**, escalate in order:
+On a stall (silence after one nudge), stop waiting and unblock the frontier yourself:
+- **Implementer:** if `git status` shows no uncommitted changes and no commit exists, `TaskStop` it and relaunch a fresh implementer for that task. If the prior hang looked auth/tool-related (e.g. an MCP authentication prompt), tell the relaunched implementer explicitly which tools to avoid. If it left uncommitted work, follow the existing "Implementer timeout with uncommitted work" rule.
+- **Reviewer:** `TaskStop` it and perform the review yourself directly in the orchestrator — read the diff and the actual current files, run `tsc`/lint/test, do any live-infrastructure verification the task calls for, then write the sentinel based on your own findings. This is a legitimate, expected fallback, not a shortcut — CLAUDE.md's "independently re-verify claims" standard applies whether the verification is done by a subagent or by you.
 
-1. **One direct nudge.** Send the agent a status-check message asking it to confirm completion or report progress now.
-2. **If that produces neither a new commit/sentinel nor a substantive reply** within the next stall interval — stop waiting on it and unblock the frontier yourself:
-   - **Implementer:** if `git status` shows no uncommitted changes and no commit exists, `TaskStop` it and relaunch a fresh implementer for that task. If the prior hang looked auth/tool-related (e.g. an MCP authentication prompt), tell the relaunched implementer explicitly which tools to avoid. If it left uncommitted work, follow the existing "Implementer timeout with uncommitted work" rule.
-   - **Reviewer:** `TaskStop` it and perform the review yourself directly in the orchestrator — read the diff and the actual current files, run `tsc`/lint/test, do any live-infrastructure verification the task calls for, then write the sentinel based on your own findings. This is a legitimate, expected fallback, not a shortcut — CLAUDE.md's "independently re-verify claims" standard applies whether the verification is done by a subagent or by you.
-
-Never re-send the same nudge repeatedly, and never let a single unresponsive agent stall the whole frontier indefinitely — the objective artifacts (commits, sentinels) are always the source of truth for whether work is done.
+Never re-send the same nudge repeatedly without waiting for a check-in cycle to pass, and never let a single unresponsive agent stall the whole frontier indefinitely — the objective artifacts (commits, sentinels) are always the source of truth for whether work is done.
 
 ### 3.4 Code review
 
