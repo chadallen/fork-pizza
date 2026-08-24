@@ -99,6 +99,8 @@ bd update <task-id> --claim --json   # repeat for each sibling
 
 **Run agents in background** so the user can still chat while agents work. Use `run_in_background: true` on all implementer and reviewer dispatches. You'll be notified when each completes.
 
+**Do NOT pass `isolation: "worktree"`.** This workflow's conflict avoidance is file-ownership prompting plus atomic commits on the shared working tree (see below), not separate checkouts. A worktree-isolated implementer commits to its own branch, invisible to the `git log <base-sha>..HEAD` / `git diff <base-sha>..HEAD` review steps and to the once-per-frontier `git push` — it silently breaks the frontier's tracking and review flow unless you remember to manually merge the branch back first. Even for single-task frontiers, dispatch without `isolation`.
+
 **If the frontier has 1 task:** dispatch a single `fork-pizza:implementer` agent in background with `model: "sonnet"`.
 
 **If the frontier has 2-3 siblings:** dispatch all implementers in a single message with multiple parallel Agent tool calls (each with `subagent_type: "fork-pizza:implementer"`, `run_in_background: true`, `model: "sonnet"`). Include in each implementer's prompt:
