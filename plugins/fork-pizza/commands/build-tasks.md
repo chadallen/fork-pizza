@@ -124,7 +124,10 @@ The real completion signal is an **objective artifact**, checked directly, not a
 - Implementer done → a new commit on the branch with the task ID in the message (`git log --oneline <base-sha>..HEAD`).
 - Reviewer done → the sentinel file exists (`ls .beads/review-approved-<task-id>`).
 
-**Don't wait passively — poll actively, with ONE pattern for both roles.** File mtimes seemed like a natural liveness signal for implementers (editing writes files) but not for reviewers (reading/testing touches nothing), which tempts you into two different mechanisms. Don't — a direct status nudge works identically for both, so use it as the single pattern: an agent that's actually working (reading OR writing) will process a queued message at its next tool-call round and reply with real progress; an agent wedged inside a single blocking tool call (e.g. an MCP tool prompting for interactive auth it can never complete headlessly) won't reply at all, because nothing queued to it runs until that call returns.
+**Don't wait passively — poll actively, checking the cheapest signal first.** Don't jump straight to interrupting the agent's own context with a chat message on every barren check-in — that's the mistake to avoid. Check for real evidence of progress before nudging:
+
+- **Implementer:** on each check-in, also check `git status` / list the expected output directory for new or modified files since the last check-in. File movement is real evidence of active work (an agent mid-orientation — reading docs, loading a skill — may legitimately show nothing for the first cycle or two, and that's normal, not a stall) — log it and keep waiting silently, no nudge.
+- **Reviewer:** has no file-write proxy (reading/testing touches nothing), so there's no cheap check to fall back on — but still don't nudge on the very first quiet cycle. A full review (reading the diff, running tests, live-infra checks) can legitimately span several check-in intervals before anything external happens.
 
 Immediately after dispatching each frontier, start a `Monitor` that watches only for the objective completion artifact — a commit for an implementer, the sentinel file for a reviewer — and pings you periodically if it hasn't appeared yet:
 
@@ -136,13 +139,15 @@ while true; do
   if [ -n "$commit" ]; then echo "COMMIT FOUND: $commit"; exit 0; fi
   # reviewer case: if [ -f .beads/review-approved-<task-id> ]; then echo "SENTINEL FOUND"; exit 0; fi
   sleep 90
-  echo "CHECK-IN: no commit/sentinel yet for <task-id> — send a status nudge"
+  echo "CHECK-IN: no commit/sentinel yet for <task-id> — check file activity before deciding whether to nudge"
 done
 ```
 
-On each "CHECK-IN", send the agent a direct message asking what it's currently doing right now — not "are you done," which a stuck agent answering nothing can't distinguish from "still working." A real reply describing genuine progress (files touched, what it's verifying) means keep waiting for the next check-in. Silence through the message — no reply by the next check-in — is the actual stall signal, regardless of whether the agent is an implementer or reviewer.
+**Only send an actual chat nudge — a direct message asking what the agent is doing right now — once the cheap check is ALSO quiet:** for an implementer, after 2-3 consecutive check-ins with zero file movement; for a reviewer, after 2-3 consecutive quiet check-ins. Reserve the interrupt for genuine ambiguity, not routine slowness — most check-ins should resolve with "still working, no action needed," not a message.
 
-On a stall (silence after one nudge), stop waiting and unblock the frontier yourself:
+When you do nudge, ask what the agent is doing right now — not "are you done," which a stuck agent answering nothing can't distinguish from "still working." A real reply describing genuine progress (files touched, what it's verifying) means keep waiting for the next check-in. Silence through the message — no reply by the next check-in — is the actual stall signal, regardless of whether the agent is an implementer or reviewer.
+
+On a stall (silence after a nudge that followed genuine quiet), stop waiting and unblock the frontier yourself:
 - **Implementer:** if `git status` shows no uncommitted changes and no commit exists, `TaskStop` it and relaunch a fresh implementer for that task. If the prior hang looked auth/tool-related (e.g. an MCP authentication prompt), tell the relaunched implementer explicitly which tools to avoid. If it left uncommitted work, follow the existing "Implementer timeout with uncommitted work" rule.
 - **Reviewer:** `TaskStop` it and perform the review yourself directly in the orchestrator — read the diff and the actual current files, run `tsc`/lint/test, do any live-infrastructure verification the task calls for, then write the sentinel based on your own findings. This is a legitimate, expected fallback, not a shortcut — CLAUDE.md's "independently re-verify claims" standard applies whether the verification is done by a subagent or by you.
 
